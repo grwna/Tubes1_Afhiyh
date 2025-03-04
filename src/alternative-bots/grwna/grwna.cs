@@ -1,7 +1,8 @@
 using System;
 using System.Drawing;
 using Robocode.TankRoyale.BotApi;
-using Robocode.TankRoyale.BotApi.Events;
+using Robocode.TankRoyale.BotApi.Events;\
+using random
 
 public class grwna : Bot
 {   
@@ -16,7 +17,12 @@ public class grwna : Bot
     public override void Run()
     {
         /* Customize bot colors, read the documentation for more information */
-        BodyColor = Color.Gray;
+        BodyColor = Color.FromArgb(0xff,0xff,0xff);
+        GunColor = Color.FromArgb(0xff,0x0,0x0);
+        RadarColor = Color.FromArgb(0xff,0x0,0x0);
+        ScanColor = Color.FromArgb(0x0, 0x00, 0x00);
+        BulletColor = Color.FromArgb(0x0, 0xcb, 0xFF);
+
 
         while (IsRunning)
         {
