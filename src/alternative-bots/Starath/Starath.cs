@@ -3,15 +3,15 @@ using System.Drawing;
 using Robocode.TankRoyale.BotApi;
 using Robocode.TankRoyale.BotApi.Events;
 
-public class TemplateBot : Bot
+public class Starath : Bot
 {   
     /* A bot that drives forward and backward, and fires a bullet */
     static void Main(string[] args)
     {
-        new TemplateBot().Start();
+        new Starath().Start();
     }
 
-    TemplateBot() : base(BotInfo.FromFile("TemplateBot.json")) { }
+    Starath() : base(BotInfo.FromFile("Starath.json")) { }
 
     public override void Run()
     {
@@ -38,6 +38,8 @@ public class TemplateBot : Bot
     {
         Console.WriteLine("Ouch! I hit a wall, must turn back!");
     }
+
+    public override void 
 
     /* Read the documentation for more events and methods */
 }
