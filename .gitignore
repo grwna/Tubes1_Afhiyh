@@ -1,5 +1,5 @@
-dev/Engine
-dev/ContohBot
+dev/Engine/*
+dev/ContohBot/*
 src/*/bin
 src/*/obj
 src/*/*/bin

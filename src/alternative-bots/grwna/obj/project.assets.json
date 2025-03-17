@@ -932,11 +932,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\RaFa\\Main\\Github\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj",
+      "projectUniqueName": "D:\\RaFa\\Main\\Github\\grwna\\grwna.csproj",
       "projectName": "grwna",
-      "projectPath": "D:\\RaFa\\Main\\Github\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj",
+      "projectPath": "D:\\RaFa\\Main\\Github\\grwna\\grwna.csproj",
       "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-      "outputPath": "D:\\RaFa\\Main\\Github\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\obj\\",
+      "outputPath": "D:\\RaFa\\Main\\Github\\grwna\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
