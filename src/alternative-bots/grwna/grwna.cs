@@ -25,7 +25,7 @@ public class grwna : Bot
             SetTurnLeft(45);
             SetForward(100);
         } else {
-            SetForward(500);
+            SetForward(500);    // Nge ram
         }
         Go();
     }
@@ -107,7 +107,11 @@ public class grwna : Bot
 
     public override void OnHitWall(HitWallEvent e)
     {
-        // Console.WriteLine("Ouch! I hit a wall, must turn back!");
+        SetTurnRight(45);
+        SetForward(20);
+        SetTurnRight(45);
+        SetForward(30);
+        Go();
     }
 
     /* Read the documentation for more events and methods */
