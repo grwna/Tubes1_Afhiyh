@@ -1,6 +1,6 @@
-D:\RaFa\Main\Github\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.csproj.AssemblyReference.cache
-D:\RaFa\Main\Github\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.GeneratedMSBuildEditorConfig.editorconfig
-D:\RaFa\Main\Github\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.AssemblyInfoInputs.cache
-D:\RaFa\Main\Github\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.AssemblyInfo.cs
-D:\RaFa\Main\Github\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.csproj.CoreCompileInputs.cache
-D:\RaFa\Main\Github\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.sourcelink.json
+C:\Users\ASUS\Stima\Tubes\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.csproj.AssemblyReference.cache
+C:\Users\ASUS\Stima\Tubes\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ASUS\Stima\Tubes\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.AssemblyInfoInputs.cache
+C:\Users\ASUS\Stima\Tubes\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.AssemblyInfo.cs
+C:\Users\ASUS\Stima\Tubes\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.csproj.CoreCompileInputs.cache
+C:\Users\ASUS\Stima\Tubes\Tubes1_Afhiyh\src\alternative-bots\grwna\obj\Debug\net6.0\grwna.sourcelink.json

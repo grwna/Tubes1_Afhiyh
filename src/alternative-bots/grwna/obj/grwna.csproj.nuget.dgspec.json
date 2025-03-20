@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\RaFa\\Main\\Github\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj": {}
+    "C:\\Users\\ASUS\\Stima\\Tubes\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj": {}
   },
   "projects": {
-    "D:\\RaFa\\Main\\Github\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj": {
+    "C:\\Users\\ASUS\\Stima\\Tubes\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\RaFa\\Main\\Github\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj",
+        "projectUniqueName": "C:\\Users\\ASUS\\Stima\\Tubes\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj",
         "projectName": "grwna",
-        "projectPath": "D:\\RaFa\\Main\\Github\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj",
-        "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-        "outputPath": "D:\\RaFa\\Main\\Github\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\obj\\",
+        "projectPath": "C:\\Users\\ASUS\\Stima\\Tubes\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\grwna.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ASUS\\Stima\\Tubes\\Tubes1_Afhiyh\\src\\alternative-bots\\grwna\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
