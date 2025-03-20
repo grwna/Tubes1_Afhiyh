@@ -45,36 +45,52 @@ public class Starath : Bot
         }
     }
 
+
+    public void calculatedFirepower(double enemyEnergy)
+    {
+        double firepower;
+
+        if (enemyEnergy <= 20)
+        {
+            // If the enemy has very low energy, maximize firepower to finish them off
+            firepower = 3.0;
+        }
+        else if (enemyEnergy >= 100)
+        {
+            // If the enemy has high energy, use minimal firepower to conserve energy
+            firepower = 1.01;
+        }
+        else
+        {
+            // Linear interpolation for intermediate enemy energy levels
+            double ratio = (enemyEnergy - 20) / (100 - 20);
+            firepower = 3.0 - ratio * (3.0 - 1.01);
+        }
+
+        // Ensure firepower is within the allowed limits
+        firepower = Math.Max(1.01, Math.Min(firepower, 3.0));
+
+        // Fire using the calculated firepower
+        Fire(firepower);    
+    }
+
     public override void OnScannedBot(ScannedBotEvent e)
     {
         // Add or update the scanned bot information.
         scannedBots[e.ScannedBotId] = new ScannedBot(e.X, e.Y, e.Energy, DistanceTo(e.X, e.Y));
 
-        // Iterate over all scanned bots to find the enemy with the lowest energy.
-        int lowestEnergyId = -1;
-        double lowestEnergy = double.MaxValue;
-        foreach (var entry in scannedBots)
+        if (targetedId == -1)
         {
-            if (entry.Value.energy < lowestEnergy)
-            {
-                lowestEnergy = entry.Value.energy;
-                lowestEnergyId = entry.Key;
-            }
+            targetedId = e.ScannedBotId;
         }
-        targetedId = lowestEnergyId;
-
-        // Fire with an appropriate power (adjust as needed).
-        // For example: if the lowest energy is below a threshold, use higher firepower.
-        if (targetedId != -1)
+        else if (scannedBots[e.ScannedBotId].energy < scannedBots[targetedId].energy)
         {
-            if (scannedBots[targetedId].energy < 20)
-            {
-                Fire(2.0);
-            }
-            else
-            {
-                Fire(1.0);
-            }
+            targetedId = e.ScannedBotId;
+        }
+
+        if (targetedId != -1 || targetedId == e.ScannedBotId)
+        {
+            calculatedFirepower(scannedBots[e.ScannedBotId].energy);
         }
     }
 
@@ -105,7 +121,7 @@ public class Starath : Bot
         }
 
         // Fire at the enemy.
-        Fire(1.0);
+        calculatedFirepower(e.Energy);
     }
 
     public override void OnHitWall(HitWallEvent e)
@@ -118,7 +134,17 @@ public class Starath : Bot
         // If the target dies, reset the targetedId.
         if (e.VictimId == targetedId)
         {
-            targetedId = -1;
+            int lowestEnergyId = -1;
+            double lowestEnergy = double.MaxValue;
+            foreach (var entry in scannedBots)
+            {
+                if (entry.Value.energy < lowestEnergy)
+                {
+                    lowestEnergy = entry.Value.energy;
+                    lowestEnergyId = entry.Key;
+                }
+            }
+            targetedId = lowestEnergyId;
         }
         // Remove the dead bot from the dictionary.
         scannedBots.Remove(e.VictimId);
