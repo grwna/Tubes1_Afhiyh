@@ -77,8 +77,17 @@ public class Starath : Bot
     public override void OnScannedBot(ScannedBotEvent e)
     {
         // Add or update the scanned bot information.
-        scannedBots[e.ScannedBotId] = new ScannedBot(e.X, e.Y, e.Energy, DistanceTo(e.X, e.Y));
-
+        if (scannedBots.ContainsKey(e.ScannedBotId))
+        {
+            scannedBots[e.ScannedBotId] = new ScannedBot(e.X, e.Y, e.Energy, DistanceTo(e.X, e.Y));
+        }
+        else
+        {
+            scannedBots.Add(e.ScannedBotId, new ScannedBot(e.X, e.Y, e.Energy, DistanceTo(e.X, e.Y)));
+        }
+        {
+            
+        }
         if (targetedId == -1)
         {
             targetedId = e.ScannedBotId;
@@ -88,7 +97,7 @@ public class Starath : Bot
             targetedId = e.ScannedBotId;
         }
 
-        if (targetedId != -1 || targetedId == e.ScannedBotId)
+        if (targetedId == e.ScannedBotId)
         {
             calculatedFirepower(scannedBots[e.ScannedBotId].energy);
         }
@@ -131,6 +140,8 @@ public class Starath : Bot
 
     public override void OnBotDeath(BotDeathEvent e)
     {
+        // Remove the dead bot from the dictionary.
+        scannedBots.Remove(e.VictimId);
         // If the target dies, reset the targetedId.
         if (e.VictimId == targetedId)
         {
@@ -146,7 +157,5 @@ public class Starath : Bot
             }
             targetedId = lowestEnergyId;
         }
-        // Remove the dead bot from the dictionary.
-        scannedBots.Remove(e.VictimId);
     }
 }
