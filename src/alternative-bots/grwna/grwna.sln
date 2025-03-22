@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grwna", "grwna.csproj", "{F6B6D6EC-C3A3-3FF4-5AC9-5190A8487B97}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grwna", "Grwna.csproj", "{F6B6D6EC-C3A3-3FF4-5AC9-5190A8487B97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

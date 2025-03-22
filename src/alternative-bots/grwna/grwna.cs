@@ -8,101 +8,59 @@ GrwnaBOT
 Greedy: Focuses on killing one tank without backing down under any circumstances
 
 */
-public class grwna : Bot
+public class Grwna : Bot
 {
     bool isIdle = true;
-
-    public double getFirepower(double enemyDistace){
-        return Math.Min(3, Math.Max(Energy * 2 / (enemyDistace*0.1),1));
-    }
-    // The main method starts our bot
-
-
-    public void circleEnemyLogic(double eDistance, double eDirection){
-        double turnAngle = NormalizeRelativeAngle(eDirection - Direction);
-        SetTurnLeft(turnAngle);
-        if (eDistance < 50){
-            SetTurnLeft(45);
-            SetForward(100);
-        } else {
-            SetForward(500);    // Nge ram
-        }
-        Go();
+    int delayFire = 0;
+    class CurrentEnemyBot {
+        public static double previousBearing = 0;
+        public static double previousX = 0;
+        public static double previousY = 0;
     }
 
     static void Main(string[] args)
     {
-        new grwna().Start();
+        new Grwna().Start();
     }
 
     // Constructor, which loads the bot settings file
-    grwna() : base(BotInfo.FromFile("grwna.json")) { }
+    Grwna() : base(BotInfo.FromFile("Grwna.json")) { }
 
     // Called when a new round is started -> initialize and do some movement
     public override void Run()
     {
         // Set colors
-        BodyColor = Color.FromArgb(0xFF, 0xFF,  0xFF);   // orange
-        GunColor = Color.FromArgb(0xFF,  0x00,  0x00);    // dark orange
-        TurretColor = Color.FromArgb(0xFF,  0x00,  0x00); // dark orange
-        RadarColor = Color.FromArgb(0xFF,  0xFF,  0xFF);  // red
-        ScanColor = Color.FromArgb(0xFF,  0xFF,  0xFF);   // red
-        BulletColor = Color.FromArgb( 0xFF,  0x00, 0x00); // light blue
+        BodyColor = Color.FromArgb(0xFF, 0xFF,  0xFF);
+        GunColor = Color.FromArgb(0xFF,  0x00,  0x00);
+        TurretColor = Color.FromArgb(0xFF,  0x00,  0x00);
+        RadarColor = Color.FromArgb(0xFF,  0xFF,  0xFF);
+        ScanColor = Color.FromArgb(0xFF,  0xFF,  0xFF);
+        BulletColor = Color.FromArgb( 0xFF,  0x00, 0x00);
 
-        // Spin the gun around slowly... forever
         while (IsRunning)
-        {   
+        {  
             if (Speed == 0){isIdle = true;}
-            if (Energy < 7){
-                for (int i = 0; i < 5; i++){
-                    SetTurnLeft(45);
-                    SetForward(50);
-                    SetTurnLeft(45);
-                    SetForward(50);
-                    SetTurnLeft(45);
-                    SetForward(50);
-                }
-            }
             if (isIdle){
                 SetForward(20);
                 SetTurnRadarLeft(360);
             }
             AdjustGunForBodyTurn = true; 
+            if (delayFire > 0){
+                delayFire--;
+            }
             Go();
         }
     }
 
-    // We scanned another bot -> fire!
    public override void OnScannedBot(ScannedBotEvent e)
     {
-        // isIdle = false;
-        // TurnRadarLeft(CalcDeltaAngle(e.Direction, RadarDirection));
-        // Console.WriteLine("Scanned bot energy: " + e.Energy);
-
-        double eDirection = DirectionTo(e.X, e.Y);
-        double turnAngle = NormalizeRelativeAngle(eDirection - GunDirection);
-        SetTurnGunLeft(turnAngle);
-        double eDistance = DistanceTo(e.X, e.Y);
-        double firepower = getFirepower(eDistance);
-        SetFire(firepower);
-        circleEnemyLogic(eDistance, eDirection);
-        SetTurnRadarLeft(0);
-        Go();
-        
+        agressiveAttack(e.X, e.Y);
     }
 
     public override void OnHitBot(HitBotEvent e)
     {
         // e = Enemy
-        double eDirection = DirectionTo(e.X, e.Y);
-        double turnAngle = NormalizeRelativeAngle(eDirection - GunDirection);
-        SetTurnGunLeft(turnAngle);
-        double eDistance = DistanceTo(e.X, e.Y);
-        double firepower = getFirepower(eDistance);
-        SetFire(firepower);
-        circleEnemyLogic(eDistance, eDirection);
-        SetTurnRadarLeft(0);
-        Go();
+        agressiveAttack(e.X, e.Y);
     }
 
     public override void OnHitWall(HitWallEvent e)
@@ -114,7 +72,10 @@ public class grwna : Bot
         Go();
     }
 
-    /* Read the documentation for more events and methods */
+    public override void OnBulletHitWall(BulletHitWallEvent e)
+    {
+        delayFire = 5;
+    }
     public override void OnHitByBullet(HitByBulletEvent e)
     {   
         isIdle = false;
@@ -123,4 +84,59 @@ public class grwna : Bot
         isIdle = true;
         Go();
     }
+
+
+    public double getFirepower(double enemyDistace){
+        return Math.Min(3, Math.Max(Energy * 2 / (enemyDistace*0.2),1));
+    }
+
+
+    public void circleEnemyLogic(double eDistance, double eDirection){
+        double turnAngle = NormalizeRelativeAngle(eDirection - Direction);
+        SetTurnLeft(turnAngle);
+        if (eDistance < 50){
+            SetTurnLeft(90);
+            SetForward(500);
+            Go();
+            SetBack(500);
+            Go();
+        } else {
+            SetForward(500);    // Nge ram
+            Go();
+        }
+    }
+    
+    public void agressiveAttack(double x, double y){
+        double eDirection = DirectionTo(x, y);
+        double turnAngle = NormalizeRelativeAngle(eDirection - GunDirection);
+
+        // Predictive shooting
+        double deltaBearing = NormalizeRelativeAngle(eDirection - CurrentEnemyBot.previousBearing);
+        double dx = x - CurrentEnemyBot.previousX;
+        double dy = y - CurrentEnemyBot.previousY;
+        double enemySpeed = Math.Sqrt(dx * dx + dy * dy);
+        if (Math.Abs(deltaBearing) > 5 && enemySpeed > 0)
+        {
+            turnAngle += deltaBearing * 0.5;
+        }
+
+        SetTurnGunLeft(turnAngle);
+
+        double eDistance = DistanceTo(x, y);
+        double firepower = getFirepower(eDistance);
+        if (delayFire == 0){
+            SetFire(firepower);
+        }
+
+        circleEnemyLogic(eDistance, eDirection);
+        SetTurnRadarLeft(0);
+
+        // Save enemy position & direction
+        CurrentEnemyBot.previousBearing = eDirection;
+        CurrentEnemyBot.previousX = x;
+        CurrentEnemyBot.previousY = y;
+
+        Go();
+    }
+
 }
