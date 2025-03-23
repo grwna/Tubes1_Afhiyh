@@ -1,15 +1,13 @@
 using System;
 using System.Drawing;
+using System.Collections.Generic;
 using Robocode.TankRoyale.BotApi;
 using Robocode.TankRoyale.BotApi.Events;
 
 public class Hnfadtya : Bot
 {   
     /* A bot that drives forward and backward, and fires a bullet */
-    private EnemyBot target = new EnemyBot(0, 0, double.MaxValue, double.MaxValue, -1);
-    // private int lockedTargetID;
-    int scannedEnemies = 0;
-    bool isScanning = true;
+    private List<EnemyBot> ListOfEnemy = new List<EnemyBot>();
 
     static void Main(string[] args)
     {
@@ -24,37 +22,23 @@ public class Hnfadtya : Bot
         TurretColor = Color.Blue;
         RadarColor = Color.Black;
         ScanColor = Color.Yellow;
-        // WaitFor(new TurnCompleteCondition(this));
-        // Console.WriteLine("im scanning by radar");
-        AdjustRadarForGunTurn = true; 
-        AdjustRadarForBodyTurn = true; 
+        // SetTurnLeft(180);
 
         while (IsRunning) {
-            // SetForward(10);
-            // SetTurnLeft(10);
-            if (scannedEnemies < EnemyCount && isScanning){
-                SetTurnRadarLeft(360);
-                isScanning = false
-            } else {
-                AdjustRadarForGunTurn = false; 
-                AdjustRadarForBodyTurn = false; 
-                AdjustGunForBodyTurn = true; // Gun bergerak independen terhadap Body
-                double turnGunAngle = NormalizeRelativeAngle(target.Direction - GunDirection);
-                SetTurnGunLeft(turnGunAngle);
-            }
-
+            SetForward(10);
+            SetTurnRadarLeft(360);
+            AdjustRadarForGunTurn = true; 
+            // int gunIncrement = 3;
             // for (int i = 0; i < 30; i++)
             // {
-            //     SetTurnGunRight(gunIncrement);
+            //     SetTurnRadarRight(gunIncrement);
             // }
             // gunIncrement *= -1;
-            // if (isScanning)
-            // {
-            //     SetForward(40);
-            // }
-            // double targetDistance, turnBodyAngle, turnGunAngle, turnRadarAngle;
+
+            // AdjustGunForBodyTurn = true; 
+
+            // SetTurnLeft(10);
             Go();
-            // isScanning = false;
         }
     }
 
@@ -65,50 +49,69 @@ public class Hnfadtya : Bot
         double Y = e.Y;
         double direction = e.Direction;
         int id = e.ScannedBotId;
-        if (scannedEnemies < EnemyCount){
-            scannedEnemies++;
+
+        EnemyBot existingEnemy = new EnemyBot(0, 0, 0, 0, -1);
+        EnemyBot target = new EnemyBot(0, 0, 0, 0, -1);
+
+        double minDistance = double.MaxValue;
+
+        // Cari bot dalam list berdasarkan ID
+        foreach (var enemy in ListOfEnemy) {
+            if (enemy.Id == id) {
+                existingEnemy = enemy;
+                break;
+            }
+        }        
+
+        if (existingEnemy == null) {
+            ListOfEnemy.Add(new EnemyBot(X, Y, distance, direction, id));            
+        } else {
+            ListOfEnemy.Remove(existingEnemy);
+            ListOfEnemy.Add(new EnemyBot(X, Y, distance, direction, id));
         }
 
-        if (scannedEnemies <= EnemyCount && distance < target.Distance) {
-            target = new EnemyBot(X, Y, distance, direction, id);
-        } 
-        else if (scannedEnemies == EnemyCount && target.Id == e.Id) {
-            // target.UpdateBot(X, Y, distance, direction, energy);
-            // SetForward(10);
-            // double bearingFromBody = BearingTo(target.X, target.Y);
-            // double bearingFromGun = GunBearingTo(target.X, target.Y); // tadinya var bukan double
-            // double bearingFromRadar = RadarBearingTo(target.X, target.Y); // tadinya var bukan double
+        foreach (var enemy in ListOfEnemy) {
+            if (enemy.Distance < minDistance) {
+                minDistance = enemy.Distance;
+                target = enemy;
+                break;
+            }
+        }        
+        if (target != null){            
+            // double turnGunAngle = NormalizeRelativeAngle(target.Direction - GunDirection);
+            // SetTurnGunLeft(turnGunAngle);
+            // SetFire(1);          
 
-            // double turnRadarAngle = NormalizeRelativeAngle(target.Direction - RadarDirection);
-            // SetTurnRadarLeft(turnRadarAngle);
-
-            double turnGunAngle = NormalizeRelativeAngle(e.Direction - GunDirection);
-            SetTurnGunLeft(turnGunAngle);
-            SetFire(2);          
-
-            double turnBodyAngle = NormalizeRelativeAngle(e.Direction - Direction);
-            // int turnBodyDirection;
-            // if (turnBodyAngle >= 0)
-            //     turnBodyDirection = 1;
-            // else {
-            //     turnBodyDirection = -1;
-            // }
+            double turnBodyAngle = NormalizeRelativeAngle(target.Direction - Direction);
             SetTurnLeft(turnBodyAngle);
+            SetFire(1);          
 
-            double targetDistance = DistanceTo(e.X, e.Y);        
-            SetForward(targetDistance); // asumsi target terkejar
+            double targetDistance = DistanceTo(target.X, target.Y);      
 
-            // SetTurnRadarLeft(0);
-            Go();   
+            if (targetDistance < 50){
+                SetTurnLeft(45);
+                SetForward(100);
+            } else {
+                SetForward(targetDistance + 200);    // Nge ram
+            }
+            SetTurnRadarLeft(0);
+            // SetForward(targetDistance + 100); // asumsi target terkejar
+
+            Go(); 
             // double power = Math.Min(3, (targetEnergy*0.15)); // Fire(3) jika target.Energy > 20
         }
     }
+
     public override void OnBotDeath(BotDeathEvent e)
     {
-        if (e.VictimId == target.Id){
-            scannedEnemies--;
-            isScanning = true;
-        }
+        EnemyBot deadEnemy = new EnemyBot(0, 0, 0, 0, -1);
+        foreach (var enemy in ListOfEnemy) {
+            if (enemy.Id == e.VictimId) {
+                deadEnemy = enemy;
+                break;
+            }
+        } 
+        ListOfEnemy.Remove(deadEnemy);
     }
     public override void OnHitBot(HitBotEvent e)
     {
@@ -122,9 +125,7 @@ public class Hnfadtya : Bot
         Go();
     }
 
-    // public void IsScanningComplete() {
-    //     return (bot - Direction) == 0;
-    // }
+
 }
 
 public class EnemyBot {
@@ -148,21 +149,5 @@ public class EnemyBot {
         Distance = distance;
         Direction = direction;
         Id = id;
-    }
-}
-
-public class TurnCompleteCondition : Condition
-{
-    private readonly Bot bot;
-
-    public TurnCompleteCondition(Bot bot)
-    {
-        this.bot = bot;
-    }
-
-    public override bool Test()
-    {
-        // turn is complete when the remainder of the turn is zero
-        return bot.TurnRemaining == 0;
     }
 }
