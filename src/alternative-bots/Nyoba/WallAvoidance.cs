@@ -21,7 +21,7 @@ public class WallAvoidance
     public bool WillHitWall(double distance, double angle)
     {
         // Convert relative angle to absolute angle
-        double absoluteAngle = Bot.NormalizeAbsoluteAngle(bot.Heading + angle);
+        double absoluteAngle = bot.NormalizeAbsoluteAngle(bot.Direction + angle);
         double radAngle = absoluteAngle * Math.PI / 180;
         
         // Calculate future position

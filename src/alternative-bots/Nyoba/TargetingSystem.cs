@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Robocode.TankRoyale.BotApi;
 
 public class TargetingSystem
@@ -39,7 +40,7 @@ public class TargetingSystem
         double absDegrees = Math.Atan2(enemyY - bot.Y, enemyX - bot.X) * 180 / Math.PI;
         
         // Convert to relative angle
-        double relDegrees = Bot.NormalizeRelativeAngle(absDegrees - bot.Heading);
+        double relDegrees = bot.NormalizeRelativeAngle(absDegrees - bot.Direction);
         
         // Turn gun to enemy
         bot.SetTurnGunRight(relDegrees);
@@ -48,7 +49,7 @@ public class TargetingSystem
         double firePower = DetermineFiringPower(minDistance);
         
         // Only fire if we have enough energy and gun is pointing at enemy
-        if (bot.Energy > firePower * 4 && Math.Abs(bot.GunHeading - absDegrees) < 3)
+        if (bot.Energy > firePower * 4 && Math.Abs(bot.GunDirection - absDegrees) < 3)
         {
             bot.SetFire(firePower);
         }

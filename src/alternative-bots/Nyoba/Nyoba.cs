@@ -162,7 +162,7 @@ public class Nyoba : Bot
         
         // Immediate evasive maneuver on collision
         double angle = Math.Atan2(Y - e.Y, X - e.X) * 180 / Math.PI;
-        angle = NormalizeRelativeAngle(angle - Heading);
+        angle = NormalizeRelativeAngle(angle - Direction);
         
         SetTurnRight(angle);
         SetBack(MOVE_DISTANCE);
@@ -178,7 +178,7 @@ public class Nyoba : Bot
         avoidanceCounter = 0;
         
         // Turn perpendicular to the wall
-        avoidAngle = NormalizeRelativeAngle(e.Angle + 90);
+        avoidAngle = NormalizeRelativeAngle(Direction + 90);
         
         SetTurnRight(avoidAngle);
         SetForward(MOVE_DISTANCE * 0.5);
