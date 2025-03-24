@@ -39,12 +39,14 @@ Greedy Algorithms can be utilized in the creation of strategy for the Tanks. By 
 <h3>GrwnaBot</h3>
 This bot uses greedy by Bullet Damage and Bonus. It focuses on killing one enemy robot at a time without caring much about defense, instead focusing on defense by offense. The idea is that each successful hit will "heal" the robot by a certain amount corresponding to the damage dealt by the bot. This aggressive behaviour makes this robot very powerful for scoring points.
 
-<h3>NyobaBot (WIP)</h3>
+<h3>KaburBot</h3>
+This bot uses Anti-Gravity Movement to isolate itself from the enemies.
 
 <h3>StarathBot</h3>
 THis bot uses greedy heuristic of targeting the weakest enemy at any one time. It focuses on Bullet Damage Bonus while not neccessarily focusing on Bullet Damage scores by itself. By targeting the weakest enemy it aims to be the bot that will deliver the last blow killing the enemy.
 
 <h3>HnfadtyaBot</h3>
+This bot uses greedy heuristic of targeting the nearest enemy at any one time.
 
 
 
