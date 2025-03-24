@@ -8,6 +8,9 @@ public class Hnfadtya : Bot
 {   
     /* A bot that drives forward and backward, and fires a bullet */
     private List<EnemyBot> ListOfEnemy = new List<EnemyBot>();
+    bool isScanning = false;
+    int turnDirection = 1; // clockwise (-1) or counterclockwise (1)
+
 
     static void Main(string[] args)
     {
@@ -23,21 +26,12 @@ public class Hnfadtya : Bot
         RadarColor = Color.Black;
         ScanColor = Color.Yellow;
         // SetTurnLeft(180);
+        SetTurnRadarLeft(360);                
 
         while (IsRunning) {
-            SetForward(10);
-            SetTurnRadarLeft(360);
-            AdjustRadarForGunTurn = true; 
-            // int gunIncrement = 3;
-            // for (int i = 0; i < 30; i++)
-            // {
-            //     SetTurnRadarRight(gunIncrement);
-            // }
-            // gunIncrement *= -1;
+            if (Speed == 0) {TurnRadarLeft(360);}
 
-            // AdjustGunForBodyTurn = true; 
-
-            // SetTurnLeft(10);
+            AdjustGunForBodyTurn = true; 
             Go();
         }
     }
@@ -77,30 +71,34 @@ public class Hnfadtya : Bot
                 break;
             }
         }        
-        if (target != null){            
-            // double turnGunAngle = NormalizeRelativeAngle(target.Direction - GunDirection);
-            // SetTurnGunLeft(turnGunAngle);
-            // SetFire(1);          
+
+        if (target != null && ListOfEnemy.Count == EnemyCount){  
+            var bearingFromGun = GunBearingTo(target.X, target.Y);
+            TurnGunLeft(bearingFromGun);
+
+            if (Math.Abs(bearingFromGun) <= 3 && GunHeat == 0)
+                Fire(Math.Min(3 - Math.Abs(bearingFromGun), Energy - .1));
+
+            // if (bearingFromGun == 0)
 
             double turnBodyAngle = NormalizeRelativeAngle(target.Direction - Direction);
-            SetTurnLeft(turnBodyAngle);
-            SetFire(1);          
-
             double targetDistance = DistanceTo(target.X, target.Y);      
-
-            if (targetDistance < 50){
-                SetTurnLeft(45);
-                SetForward(100);
-            } else {
-                SetForward(targetDistance + 200);    // Nge ram
-            }
-            SetTurnRadarLeft(0);
-            // SetForward(targetDistance + 100); // asumsi target terkejar
-
-            Go(); 
-            // double power = Math.Min(3, (targetEnergy*0.15)); // Fire(3) jika target.Energy > 20
+            ChasingTarget(turnBodyAngle, targetDistance);
+            Rescan();
         }
     }
+    private void ChasingTarget(double TargetDirection, double TargetDistance)
+    {
+        SetTurnLeft(TargetDirection);
+        SetForward(TargetDistance);
+        Go();
+    }
+
+    // public virtual void OnBulletHitWall(BulletHitWallEvent bulletHitWallEvent) {
+    //     if ((bulletHitWallEvent.bullet).ownerid == MyId) {
+    //         Rescan();
+    //     }
+    // }
 
     public override void OnBotDeath(BotDeathEvent e)
     {
@@ -115,17 +113,21 @@ public class Hnfadtya : Bot
     }
     public override void OnHitBot(HitBotEvent e)
     {
-        SetFire(2);
+        var bearingFromGun = GunBearingTo(e.X, e.Y);
+
+        if (Math.Abs(bearingFromGun) <= 3 && GunHeat == 0)
+            Fire(Math.Min(3 - Math.Abs(bearingFromGun), Energy - .1));
+
+        if (bearingFromGun == 0)
+            Rescan();
     }
 
     public override void OnHitWall(HitWallEvent e)
     {
-        SetTurnRight(90);
-        SetForward(20);
-        Go();
+        Back(10);
+        TurnRight(90);
+        Forward(20);
     }
-
-
 }
 
 public class EnemyBot {
@@ -136,14 +138,6 @@ public class EnemyBot {
     public int Id { get; set; }
 
     public EnemyBot(double x, double y, double distance, double direction, int id) {
-        X = x;
-        Y = y;
-        Distance = distance;
-        Direction = direction;
-        Id = id;
-    }
-
-    public void UpdateBot(double x, double y, double distance, double direction, int id) {
         X = x;
         Y = y;
         Distance = distance;
