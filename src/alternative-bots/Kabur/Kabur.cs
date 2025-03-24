@@ -96,7 +96,7 @@ public class Kabur : Bot
         double turnAngle = NormalizeRelativeAngle(eDirection - GunDirection);
         SetTurnGunLeft(turnAngle);
         double firepower = getFirepower(DistanceTo(X,Y));
-        if (Energy > 30)
+        if (Energy > 20)
             SetFire(firepower);
         Go();
     }

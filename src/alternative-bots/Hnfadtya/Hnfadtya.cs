@@ -19,24 +19,24 @@ public class Hnfadtya : Bot
 
     Hnfadtya() : base(BotInfo.FromFile("Hnfadtya.json")) { }
 
-    public override void Run()
-    {
+    public override void Run() {
         BodyColor = Color.Blue;
         TurretColor = Color.Blue;
         RadarColor = Color.Black;
         ScanColor = Color.Yellow;
-        // SetTurnLeft(180);
-        SetTurnRadarLeft(360);                
+
+        AdjustGunForBodyTurn = true;
+        AdjustRadarForGunTurn = true;
 
         while (IsRunning) {
-            if (Speed == 0) {TurnRadarLeft(360);}
-
-            AdjustGunForBodyTurn = true; 
+            SetTurnRadarRight(360); // Keep scanning
+            SetForward(100);          // Keep moving
+            SetTurnRight(30);       // Circle a bit
             Go();
-        }
+            }
     }
-    public override void OnScannedBot(ScannedBotEvent e)
-    {
+
+    public override void OnScannedBot(ScannedBotEvent e) {
         double distance = DistanceTo(e.X, e.Y);
         double X = e.X;
         double Y = e.Y;
@@ -49,18 +49,20 @@ public class Hnfadtya : Bot
         double minDistance = double.MaxValue;
 
         // Cari bot dalam list berdasarkan ID
-        foreach (var enemy in ListOfEnemy) {
-            if (enemy.Id == id) {
-                existingEnemy = enemy;
-                break;
+        foreach (var enemy in ListOfEnemy){
+            if (enemy.Distance < minDistance) {
+                minDistance = enemy.Distance;
+                target = enemy;
             }
-        }        
+        }
+         
 
-        if (existingEnemy == null) {
-            ListOfEnemy.Add(new EnemyBot(X, Y, distance, direction, id));            
-        } else {
-            ListOfEnemy.Remove(existingEnemy);
+        var index = ListOfEnemy.FindIndex(bot => bot.Id == id);
+        if (index == -1) {
             ListOfEnemy.Add(new EnemyBot(X, Y, distance, direction, id));
+        }
+        else {
+            ListOfEnemy[index] = new EnemyBot(X, Y, distance, direction, id);
         }
 
         foreach (var enemy in ListOfEnemy) {
@@ -73,12 +75,11 @@ public class Hnfadtya : Bot
 
         if (target != null && ListOfEnemy.Count == EnemyCount){  
             var bearingFromGun = GunBearingTo(target.X, target.Y);
-            TurnGunLeft(bearingFromGun);
+            SetTurnGunLeft(bearingFromGun);
 
             if (Math.Abs(bearingFromGun) <= 3 && GunHeat == 0)
-                Fire(Math.Min(3 - Math.Abs(bearingFromGun), Energy - .1));
+                SetFire(Math.Min(3 - Math.Abs(bearingFromGun), Energy - .1));
 
-            // if (bearingFromGun == 0)
 
             double turnBodyAngle = NormalizeRelativeAngle(target.Direction - Direction);
             double targetDistance = DistanceTo(target.X, target.Y);      
@@ -90,7 +91,6 @@ public class Hnfadtya : Bot
     {
         SetTurnLeft(TargetDirection);
         SetForward(TargetDistance);
-        Go();
     }
 
 
@@ -118,9 +118,9 @@ public class Hnfadtya : Bot
 
     public override void OnHitWall(HitWallEvent e)
     {
-        Back(10);
-        TurnRight(90);
-        Forward(20);
+        SetBack(10);
+        SetTurnRight(90);
+        SetForward(20);
     }
 }
 
