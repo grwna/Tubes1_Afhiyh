@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using Robocode.TankRoyale.BotApi;
 using Robocode.TankRoyale.BotApi.Events;
 
-public class Nyoba : Bot
+public class Kabur : Bot
 {   
-    /* A bot that drives forward and backward, and fires a bullet */
     static void Main(string[] args)
     {
-        new Nyoba().Start();
+        new Kabur().Start();
     }
 
     public struct EnemyBot
@@ -31,26 +30,43 @@ public class Nyoba : Bot
     
 
 
-    Nyoba() : base(BotInfo.FromFile("Nyoba.json")) { }
+    Kabur() : base(BotInfo.FromFile("Kabur.json")) { }
 
     Dictionary<int, EnemyBot> enemies = new Dictionary<int, EnemyBot>();
     
     const double MOVE_DISTANCE = 100;
+    double prevFx = 0, prevFy = 0;
+    int Width = 800, Height = 600;
+    Random rand = new Random();
 
     public override void Run()
     {
-        int currEnemies = EnemyCount;
         AdjustGunForBodyTurn = true;
         AdjustRadarForGunTurn = true;
+        int currEnemies = EnemyCount;
         // AdjustRadarForBodyTurn = true;
         BodyColor = Color.Gray;
 
         while (IsRunning)
         {
-            SetTurnRadarRight(Double.PositiveInfinity);
+            SetTurnRadarRight(360);
             if (currEnemies > EnemyCount) currEnemies = EnemyCount;
             (double totalFx, double totalFy) = CalculateTotalEnemyForce();
-            double angle = Math.Atan2(totalFy, totalFx);
+
+            double smoothing = 0.8;
+            prevFx = smoothing * prevFx + (1 - smoothing) * totalFx;
+            prevFy = smoothing * prevFy + (1 - smoothing) * totalFy;
+
+            double forceMagnitude = Math.Sqrt(prevFx * prevFx + prevFy * prevFy);
+            if (forceMagnitude < 0.1)
+            {
+                SetTurnRight(45 + rand.NextDouble() * 90);
+                SetForward(MOVE_DISTANCE / 2);
+                Go();
+                continue;
+            }
+
+            double angle = Math.Atan2(prevFy, prevFx);
             angle = NormalizeRelativeAngle(angle * 180 / Math.PI);
             if (Math.Abs(angle) < 90)
             {
@@ -62,14 +78,24 @@ public class Nyoba : Bot
                 SetTurnRight(NormalizeRelativeAngle(angle + 180));
                 SetBack(MOVE_DISTANCE);
             }
+            // Wall Avoidance
+            if (X < 50 || X > 750 || Y < 50 || Y > 550) {
+                SetTurnRight(90);
+                SetBack(MOVE_DISTANCE);
+}
+
             Go();
-            // SetForward(-100); 
-            // SetFire(1);
-            // SetTurnRight(-90);
-            // SetTurnRadarRight(360);
         }
     }
 
+    public void FiringLogic(double X, double Y){
+        double eDirection = DirectionTo(X, Y);
+        double turnAngle = NormalizeRelativeAngle(eDirection - GunDirection);
+        SetTurnGunLeft(turnAngle);
+        if (Energy > 30)
+            SetFire(1);
+        Go();
+    }
     private (double totalFx, double totalFy) CalculateTotalEnemyForce()
     {
         double totalFx = 0, totalFy = 0;
@@ -82,12 +108,27 @@ public class Nyoba : Bot
 
             double energyFactor = enemy.Energy / 100;
 
-            double force = 8000 * energyFactor / distanceSq;
+            double force = 9000 * energyFactor / distanceSq;
 
             double angle = Math.Atan2(dy, dx);
             totalFx += force * Math.Cos(angle);
             totalFy += force * Math.Sin(angle);
         }
+
+        // Force dari wall
+        double wallMargin = 60;
+        double wallForce = 10000;
+
+        if (X < wallMargin)
+            totalFx += wallForce / (X * X); // push right
+        else if (X > Width - wallMargin)
+            totalFx -= wallForce / ((Width - X) * (Width - X)); // push left
+
+        if (Y < wallMargin)
+            totalFy += wallForce / (Y * Y); // push down
+        else if (Y > Height - wallMargin)
+            totalFy -= wallForce / ((Height - Y) * (Height - Y));
+
         return (totalFx, totalFy);
     }
 
@@ -101,17 +142,23 @@ public class Nyoba : Bot
         {
             enemies.Add(e.ScannedBotId, new EnemyBot(e.X, e.Y, e.Energy, e.Direction));
         }
+        FiringLogic(e.X, e.Y);
         // Console.WriteLine("I see a bot at " + e.X + ", " + e.Y);
     }
 
     public override void OnHitBot(HitBotEvent e)
     {
         Console.WriteLine("Ouch! I hit a bot at " + e.X + ", " + e.Y);
+        FiringLogic(e.X,e.Y);
     }
+
 
     public override void OnHitWall(HitWallEvent e)
     {
         Console.WriteLine("Ouch! I hit a wall, must turn back!");
+        SetTurnRight(90);
+        SetBack(100);
+        Go();
     }
 
     public override void OnBotDeath(BotDeathEvent e)

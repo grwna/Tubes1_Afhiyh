@@ -1,10 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-<<<<<<<< HEAD:src/alternative-bots/Nyoba/Nyoba.csproj
-        <RootNamespace>Nyoba</RootNamespace>
-========
         <RootNamespace>Hnfadtya</RootNamespace>
->>>>>>>> alt-bot/hnfadtya:src/alternative-bots/Hnfadtya/Hnfadtya.csproj
         <OutputType>Exe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
         <LangVersion>10.0</LangVersion>
