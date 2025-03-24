@@ -35,7 +35,6 @@ public class Hnfadtya : Bot
             Go();
         }
     }
-
     public override void OnScannedBot(ScannedBotEvent e)
     {
         double distance = DistanceTo(e.X, e.Y);
@@ -94,11 +93,6 @@ public class Hnfadtya : Bot
         Go();
     }
 
-    // public virtual void OnBulletHitWall(BulletHitWallEvent bulletHitWallEvent) {
-    //     if ((bulletHitWallEvent.bullet).ownerid == MyId) {
-    //         Rescan();
-    //     }
-    // }
 
     public override void OnBotDeath(BotDeathEvent e)
     {
