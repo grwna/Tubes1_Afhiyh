@@ -8,10 +8,8 @@ public class Hnfadtya : Bot
 {   
     /* A bot that drives forward and backward, and fires a bullet */
     private List<EnemyBot> ListOfEnemy = new List<EnemyBot>();
-    bool isScanning = false;
-    int turnDirection = 1; // clockwise (-1) or counterclockwise (1)
-
-
+    EnemyBot target = new EnemyBot(0, 0, double.MaxValue, double.MaxValue, -1);
+    int targetId = -1;
     static void Main(string[] args)
     {
         new Hnfadtya().Start();
@@ -26,13 +24,17 @@ public class Hnfadtya : Bot
         RadarColor = Color.Black;
         ScanColor = Color.Yellow;
         // SetTurnLeft(180);
-        SetTurnRadarLeft(360);                
+        // SetTurnRadarLeft(360);                
 
         while (IsRunning) {
-            if (Speed == 0) {TurnRadarLeft(360);}
-
-            AdjustGunForBodyTurn = true; 
+            // if (Speed == 0) {TurnRadarLeft(360);}
+            SetForward(2000);
+            SetTurnRight(10);
+            SetTurnGunRight(20);
             Go();
+
+            // AdjustGunForBodyTurn = true; 
+
         }
     }
 
@@ -43,49 +45,44 @@ public class Hnfadtya : Bot
         double Y = e.Y;
         double direction = e.Direction;
         int id = e.ScannedBotId;
-
+        int index = -1;
         EnemyBot existingEnemy = new EnemyBot(0, 0, 0, 0, -1);
-        EnemyBot target = new EnemyBot(0, 0, 0, 0, -1);
 
-        double minDistance = double.MaxValue;
-
-        // Cari bot dalam list berdasarkan ID
-        foreach (var enemy in ListOfEnemy) {
-            if (enemy.Id == id) {
-                existingEnemy = enemy;
-                break;
+        for (int i = 0; i < ListOfEnemy.Count; i++) {
+            if (ListOfEnemy[i].Id == id) {
+                ListOfEnemy[i].X = X;
+                ListOfEnemy[i].Y = Y;
+                ListOfEnemy[i].Distance = distance;
+                ListOfEnemy[i].Direction = direction;
+                index = i;      
+                break; 
             }
-        }        
-
-        if (existingEnemy == null) {
+        }
+        if (index == -1) {
             ListOfEnemy.Add(new EnemyBot(X, Y, distance, direction, id));            
-        } else {
-            ListOfEnemy.Remove(existingEnemy);
-            ListOfEnemy.Add(new EnemyBot(X, Y, distance, direction, id));
+            index = ListOfEnemy.Count - 1;
         }
 
-        foreach (var enemy in ListOfEnemy) {
-            if (enemy.Distance < minDistance) {
-                minDistance = enemy.Distance;
-                target = enemy;
-                break;
-            }
-        }        
+        if (ListOfEnemy[index].Distance < target.Distance) {
+            targetId = ListOfEnemy[index].Id;
+        }     
 
-        if (target != null && ListOfEnemy.Count == EnemyCount){  
+        if (targetId == id) {
             var bearingFromGun = GunBearingTo(target.X, target.Y);
-            TurnGunLeft(bearingFromGun);
+            // TurnGunLeft(bearingFromGun);
 
             if (Math.Abs(bearingFromGun) <= 3 && GunHeat == 0)
                 Fire(Math.Min(3 - Math.Abs(bearingFromGun), Energy - .1));
 
-            // if (bearingFromGun == 0)
-
-            double turnBodyAngle = NormalizeRelativeAngle(target.Direction - Direction);
-            double targetDistance = DistanceTo(target.X, target.Y);      
-            ChasingTarget(turnBodyAngle, targetDistance);
-            Rescan();
+            // double turnBodyAngle = NormalizeRelativeAngle(target.Direction - Direction);
+            // double targetDistance = DistanceTo(target.X, target.Y);      
+            if (bearingFromGun == 0)
+                Rescan();
+            // ChasingTarget(turnBodyAngle, targetDistance);            
         }
+        // if (target.Id != -1 && ListOfEnemy.Count == EnemyCount){  
+        // }
+
     }
     private void ChasingTarget(double TargetDirection, double TargetDistance)
     {
