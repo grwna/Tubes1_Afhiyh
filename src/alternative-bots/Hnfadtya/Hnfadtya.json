@@ -1,0 +1,10 @@
+{
+  "name": "Hnfadtya",
+  "version": "1.0",
+  "authors": ["Hanif"],
+  "description": "A bot that chasing and firing on the nearest enemy until destroyed and repeat",
+  "homepage": "",
+  "countryCodes": ["id"],
+  "platform": ".Net 9.0",
+  "programmingLang": "C# 10.0"
+}
