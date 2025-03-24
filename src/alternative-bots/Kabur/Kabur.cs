@@ -127,7 +127,7 @@ public class Kabur : Bot
         if (X < wallMargin)
             totalFx += wallForce / (X * X); // push right
         else if (X > Width - wallMargin)
-            totalFx -= wallForce / ((Width - X) * (Width - X)); // push left
+            totalFx -= wallForce / ((Width - X) * (Width - X));
 
         if (Y < wallMargin)
             totalFy += wallForce / (Y * Y); // push down
@@ -148,19 +148,16 @@ public class Kabur : Bot
             enemies.Add(e.ScannedBotId, new EnemyBot(e.X, e.Y, e.Energy, e.Direction));
         }
         FiringLogic(e.X, e.Y);
-        // Console.WriteLine("I see a bot at " + e.X + ", " + e.Y);
     }
 
     public override void OnHitBot(HitBotEvent e)
     {
-        Console.WriteLine("Ouch! I hit a bot at " + e.X + ", " + e.Y);
         FiringLogic(e.X,e.Y);
     }
 
 
     public override void OnHitWall(HitWallEvent e)
     {
-        Console.WriteLine("Ouch! I hit a wall, must turn back!");
         SetTurnRight(90);
         SetBack(100);
         Go();
