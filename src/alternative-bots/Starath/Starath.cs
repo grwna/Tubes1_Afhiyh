@@ -43,37 +43,48 @@ public class Starath : Bot
         RadarColor  = Color.FromArgb(0xFF, 0xCC, 0x22, 0x22);   // merah 
         ScanColor   = Color.FromArgb(0xFF, 0xCC, 0x22, 0x22);   // merah
         BulletColor = Color.FromArgb(0xFF, 0xCC, 0x22, 0x22);   // merah
-        
+
+        int enemyCount = EnemyCount;
+
         while (IsRunning)
         {
+            MaxSpeed = 6.0;
+            if (enemyCount > EnemyCount)
+            {
+                enemyCount = EnemyCount;
+            }
+            targetedId = findWeakestBot();
             SetForward(distance);
             SetTurnRight(10);
-            TurnGunRight(20);
+            SetTurnGunRight(20);
+            Go();
         }
+    }
+
+    int findWeakestBot()
+    {
+        int weakestId = -1;
+        double lowestEnergy = double.MaxValue;
+        foreach (var entry in scannedBots)
+        {
+            if (entry.Value.energy < lowestEnergy)
+            {
+                lowestEnergy = entry.Value.energy;
+                weakestId = entry.Key;
+            }
+        }
+        return weakestId;
     }
 
 
     public void calculatedFirepower(double enemyEnergy)
     {
-        double firepower;
+        double ratio = (enemyEnergy - 20) / (100 - 20);
+        double rawFirepower = 3.0 - ratio * (3.0 - 1.01);
+        double firepower = Math.Min(rawFirepower, 3.0);
 
-        if (enemyEnergy <= 20)
-        {
-            firepower = 3.0;
-        }
-        else if (enemyEnergy >= 100)
-        {
-            firepower = 1.01;
-        }
-        else
-        {
-            double ratio = (enemyEnergy - 20) / (100 - 20);
-            firepower = 3.0 - ratio * (3.0 - 1.01);
-        }
-
-        firepower = Math.Max(1.01, Math.Min(firepower, 3.0));
-
-        Fire(firepower);    
+        SetFire(firepower);  
+        Go();  
     }
 
     public override void OnScannedBot(ScannedBotEvent e)
@@ -85,15 +96,6 @@ public class Starath : Bot
         else
         {
             scannedBots.Add(e.ScannedBotId, new ScannedBot(e.X, e.Y, e.Energy, DistanceTo(e.X, e.Y)));
-        }
-
-        if (targetedId == -1)
-        {
-            targetedId = e.ScannedBotId;
-        }
-        else if (scannedBots[e.ScannedBotId].energy < scannedBots[targetedId].energy)
-        {
-            targetedId = e.ScannedBotId;
         }
 
         if (targetedId == e.ScannedBotId)
@@ -108,7 +110,7 @@ public class Starath : Bot
         double deltaY = e.Y - Y;
         
         double absoluteBearing = Math.Atan2(deltaX, deltaY) * (180.0 / Math.PI);
-        absoluteBearing = (absoluteBearing + 360) % 360;  // Normalize to [0, 360)
+        absoluteBearing = (absoluteBearing + 360) % 360;
 
         double relativeBearing = NormalizeRelativeAngle(absoluteBearing - Direction);
 
@@ -123,7 +125,8 @@ public class Starath : Bot
             SetTurnLeft(90 + relativeBearing);
         }
 
-        calculatedFirepower(e.Energy);
+        SetFire(3);
+        Go();
     }
 
     public override void OnHitWall(HitWallEvent e)
@@ -135,16 +138,6 @@ public class Starath : Bot
     public override void OnBotDeath(BotDeathEvent e)
     {
         scannedBots.Remove(e.VictimId);
-        int lowestEnergyId = -1;
-        double lowestEnergy = double.MaxValue;
-        foreach (var entry in scannedBots)
-        {
-            if (entry.Value.energy < lowestEnergy)
-            {
-                lowestEnergy = entry.Value.energy;
-                lowestEnergyId = entry.Key;
-            }
-        }
-        targetedId = lowestEnergyId;
+        targetedId = -1;
     }
 }
