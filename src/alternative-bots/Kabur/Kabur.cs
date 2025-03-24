@@ -88,14 +88,19 @@ public class Kabur : Bot
         }
     }
 
+    public double getFirepower(double enemyDistace){
+        return Math.Min(3, Math.Max(Energy * 2 / (enemyDistace*0.1),1));
+    }
     public void FiringLogic(double X, double Y){
         double eDirection = DirectionTo(X, Y);
         double turnAngle = NormalizeRelativeAngle(eDirection - GunDirection);
         SetTurnGunLeft(turnAngle);
+        double firepower = getFirepower(DistanceTo(X,Y));
         if (Energy > 30)
-            SetFire(1);
+            SetFire(firepower);
         Go();
     }
+
     private (double totalFx, double totalFy) CalculateTotalEnemyForce()
     {
         double totalFx = 0, totalFy = 0;
