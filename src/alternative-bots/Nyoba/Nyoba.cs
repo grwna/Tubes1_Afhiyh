@@ -39,7 +39,6 @@ public class Nyoba : Bot
 
     public override void Run()
     {
-        movement = Double.PositiveInfinity;
         int currEnemies = EnemyCount;
         AdjustGunForBodyTurn = true;
         AdjustRadarForGunTurn = true;
